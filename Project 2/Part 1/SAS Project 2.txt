@@ -1,0 +1,129 @@
+libname PRJCT_2 '/folders/myfolders/SAS_PROJECT_2';
+
+/*Part 1 - Problem 1*/
+%let interval=Lot_Area Year_Built Gr_Liv_Area Garage_Area Mo_Sold Yr_Sold SalePrice Basement_Area Deck_Porch_Area Age_Sold Log_Price;
+%let categorical=House_Style Overall_Qual Overall_Cond Heating_Qc Central_Air Bedroom_AbvGr FirePlaces Full_Bathroom Half_Bathroom Total_Bathroom Season_Sold Garage_Type_2 Foundation_2 Masonry_Veneer Lot_Shape_2 House_style2 Overall_Qual2 Overall_Cond2 Bonus;
+
+/*Part 1 - Problem 2*/
+proc univariate data=PRJCT_2.team11 plot;
+var &interval;
+run;
+
+proc freq data=PRJCT_2.team11;
+tables &categorical/plots=freqplot(type=dot);
+run;
+
+/*Part 1 - Problem 3*/
+ods graphics on;
+   
+proc ttest data=PRJCT_2.team11 h0=135000 plots(showh0) sides=2 alpha=0.05;
+  var SalePrice;
+run;
+   
+ods graphics off;
+
+/*Part 1 - Problem 4*/
+ods graphics on;
+   
+proc ttest data=PRJCT_2.team11 h0=135000 plots(showh0) sides=2 alpha=0.05;
+  class Masonry_Veneer; 
+  var SalePrice;
+run;
+   
+ods graphics off;
+
+/*Part 1 - Problem 5*/
+
+title "Scatter plots to show relationships between continuous predictors";
+proc sgplot data=PRJCT_2.team11;
+  scatter x=Lot_Area y=SalePrice;
+run;
+title;
+
+/*Part 1 - Problem 6*/
+ods graphics on;
+
+proc glm data=PRJCT_2.team11 plot=diagnostics;
+   class Heating_QC;
+   model SalePrice = Heating_QC;
+   means Heating_QC / alpha=0.05 hovtest;
+run;
+
+ods graphics off;
+
+/*Part 1 - Problem 7*/
+ods graphics on;
+
+proc glm data=PRJCT_2.team11 plot=diagnostics;
+   class Heating_QC;
+   model SalePrice = Heating_QC;
+   lsmeans Heating_QC;
+run;
+
+ods graphics off;
+
+/*Part 1 - Problem 8*/
+ods graphics on;
+
+title "Relationships between SalePrice and the continuous predictor variables in the data set";
+proc corr data=PRJCT_2.team11 plots=scatter;
+   var &interval;
+   with SalePrice;
+ run;
+title;
+
+ods graphics off;
+
+/*Part 1 - Problem 9*/
+ods graphics on;
+
+PROC REG DATA=PRJCT_2.team11 plots=ResidualByPredicted;    
+MODEL SalePrice=Lot_Area Year_Built Gr_Liv_Area Garage_Area Mo_Sold Yr_Sold Basement_Area Deck_Porch_Area Age_Sold Log_Price;
+title "Simple linear regression analysis with SalePrice as the response variable";
+RUN;
+QUIT;
+title;
+
+ods graphics off;
+
+/*Part 1 - Problem 10*/
+
+proc glm data=PRJCT_2.team11;
+class Heating_QC Season_Sold;
+model SalePrice=Heating_QC|Season_Sold;
+means Heating_QC|Season_Sold;
+title "Two-Way analysis of variance to test for Heating_QC and Season_Sold";
+run;
+quit;
+title;
+
+/*Part 1 - Problem 11*/
+
+
+proc plm restore=sasuser.BlockAnalysis;
+class Heating_QC Season_Sold;
+model SalePrice=Heating_QC|Season_Sold;
+means Heating_QC|Season_Sold;
+score data=PRJCT_2.team11 out=team11 alpha=0.05;
+title "Two-Way analysis of variance to test for Heating_QC and Season_Sold";
+run;
+quit;
+title;
+
+/*Part 1 - Problem 12*/
+
+ods graphics on;
+
+PROC REG DATA=PRJCT_2.team11 plots=ResidualByPredicted;    
+MODEL SalePrice=Lot_Area Basement_Area /selection=forward slentry=0.05 ;;
+title "Regression Equation to predict SalePrice";
+RUN;
+QUIT;
+title;
+
+ods graphics off;
+
+
+
+
+
